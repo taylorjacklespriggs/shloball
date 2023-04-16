@@ -18,7 +18,7 @@ window.onload = () => {
   const worldWidth = 2000;
   const worldHeight = 1000;
 
-  const world = new World(worldWidth, worldHeight);
+  const world = new World(worldWidth, worldHeight, { x: 0, y: -10 });
   const camera = new Camera(
     world,
     context,
@@ -40,6 +40,8 @@ window.onload = () => {
 
     // Update physics objects
     objects.forEach((object) => {
+      object.acceleration.x += world.gravity.x; // Apply gravity as acceleration
+      object.acceleration.y += world.gravity.y;
       object.update(deltaTime);
       object.handleBoundaryCollision();
     });

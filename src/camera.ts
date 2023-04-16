@@ -20,6 +20,12 @@ export class Camera {
       this.context.canvas.width,
       this.context.canvas.height
     );
+    this.context.save();
+
+    // Flip the y-axis
+    this.context.scale(1, -1);
+    this.context.translate(0, -this.context.canvas.height);
+
     objects.forEach((object) => {
       this.context.fillRect(
         object.position.x * this.scale,
@@ -28,5 +34,7 @@ export class Camera {
         object.boundingBox.height * this.scale
       );
     });
+
+    this.context.restore();
   }
 }
