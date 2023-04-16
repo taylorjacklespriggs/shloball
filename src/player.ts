@@ -2,11 +2,12 @@
 import { PhysicsObject } from "./physics_object";
 import { World } from "./world";
 import { Bubble } from "./bubble";
+import { config } from "./config";
 
 export class Player extends PhysicsObject {
-  static readonly WIDTH = 60;
-  static readonly HEIGHT = 30;
-  static readonly CROUCHED_HEIGHT = 20;
+  static readonly WIDTH = config.player.width;
+  static readonly HEIGHT = config.player.height;
+  static readonly CROUCHED_HEIGHT = config.player.crouchedHeight;
   bubble?: Bubble;
   crouched: boolean;
   canJump: boolean;

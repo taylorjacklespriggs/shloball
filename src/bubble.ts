@@ -1,13 +1,14 @@
 // src/bubble.ts
+import { config } from "./config";
 import { PhysicsObject } from "./physics_object";
 import { World } from "./world";
 
 export class Bubble extends PhysicsObject {
   timer: number;
-  static readonly GROWTH_TIME = 500;
-  static readonly LIFETIME = 10000;
-  static readonly START_RADIUS = 10;
-  static readonly END_RADIUS = 30;
+  static readonly GROWTH_TIME = config.bubble.growthTime;
+  static readonly LIFETIME = config.bubble.lifetime;
+  static readonly START_RADIUS = config.bubble.startRadius;
+  static readonly END_RADIUS = config.bubble.endRadius;
 
   constructor(world: World, x: number, y: number) {
     const mass = 0; // Bubble doesn't have any mass
