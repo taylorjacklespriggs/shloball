@@ -2,7 +2,7 @@ export const config = {
   world: {
     width: 960,
     height: 540,
-    gravity: { x: 0, y: -40 },
+    gravity: { x: 0, y: -300 },
     friction: 0.1,
   },
   player: {

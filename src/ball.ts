@@ -8,6 +8,6 @@ export class Ball extends PhysicsObject {
     const mass = config.ball.mass;
     const width = config.ball.radius * 2;
     const height = config.ball.radius * 2;
-    super(world, mass, x, y, width, height, false);
+    super(world, mass, x, y, width, height, false, 1);
   }
 }
