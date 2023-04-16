@@ -1,7 +1,7 @@
 // src/bubble.ts
 import { config } from "./config";
 import { PhysicsObject } from "./physics_object";
-import { World } from "./world";
+import { Player } from "./player";
 
 export class Bubble extends PhysicsObject {
   timer: number;
@@ -9,13 +9,17 @@ export class Bubble extends PhysicsObject {
   static readonly LIFETIME = config.bubble.lifetime;
   static readonly START_RADIUS = config.bubble.startRadius;
   static readonly END_RADIUS = config.bubble.endRadius;
+  radius: number;
+  id: number;
 
-  constructor(world: World, x: number, y: number) {
+  constructor(player: Player, x: number, y: number) {
     const mass = 0; // Bubble doesn't have any mass
     const width = Bubble.START_RADIUS * 2;
     const height = Bubble.START_RADIUS * 2;
-    super(world, mass, x, y, width, height, true);
+    super(player.getWorld(), mass, x, y, width, height, true);
     this.timer = 0;
+    this.radius = Bubble.START_RADIUS;
+    this.id = player.id;
   }
 
   update(deltaTime: number): void {
@@ -25,8 +29,8 @@ export class Bubble extends PhysicsObject {
     // Grow the bubble
     if (this.timer < Bubble.GROWTH_TIME) {
       const growthFactor = this.timer / Bubble.GROWTH_TIME;
-      this.boundingBox.width =
-        (Bubble.START_RADIUS + (Bubble.END_RADIUS - Bubble.START_RADIUS) * growthFactor) * 2;
+      this.radius = (Bubble.START_RADIUS + (Bubble.END_RADIUS - Bubble.START_RADIUS) * growthFactor);
+      this.boundingBox.width = this.radius * 2
       this.boundingBox.height = this.boundingBox.width;
     }
 

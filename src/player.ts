@@ -1,5 +1,6 @@
 // src/player.ts
 import { PhysicsObject } from "./physics_object";
+import { Game } from "./game";
 import { World } from "./world";
 import { Bubble } from "./bubble";
 import { config } from "./config";
@@ -7,25 +8,34 @@ import { Input } from "./types";
 import { Ball } from "./ball";
 
 export class Player extends PhysicsObject {
-  static readonly WIDTH = config.player.width;
-  static readonly HEIGHT = config.player.height;
   static readonly CROUCHED_HEIGHT = config.player.crouchedHeight;
+  static readonly STANDING_HEIGHT = config.player.standingHeight;
+  game: Game;
   bubble?: Bubble;
   crouched: boolean;
   canJump: boolean;
   id: number;
 
-  constructor(world: World, x: number, y: number, id: number) {
+  constructor(game: Game, x: number, y: number, id: number) {
     const mass = config.player.mass;
-    super(world, mass, x, y, Player.WIDTH, Player.HEIGHT);
+    super(game.getWorld(), mass, x, y, config.player.width, Player.STANDING_HEIGHT);
+    this.game = game;
     this.crouched = false;
     this.canJump = true;
     this.id = id;
   }
 
+  getWorld(): World {
+    return this.game.getWorld();
+  }
+
   update(deltaTime: number, input: Input): void {
     super.update(deltaTime);
+    this.updatePlayerMovement(input);
     this.handleInput(deltaTime, input);
+    const gravity = this.game.getWorld().gravity;
+    this.acceleration.x += gravity.x;
+    this.acceleration.y += gravity.y;
   }
 
   handleInput(deltaTime: number, input: Input): void {
@@ -39,8 +49,7 @@ export class Player extends PhysicsObject {
     if (!this.bubble) {
       const bubbleX = this.position.x + this.boundingBox.width / 2;
       const bubbleY = this.position.y + this.boundingBox.height / 2;
-      this.bubble = new Bubble(this.world, bubbleX, bubbleY);
-      this.world.addObject(this.bubble);
+      this.bubble = new Bubble(this, bubbleX, bubbleY);
     }
   }
 
@@ -51,13 +60,40 @@ export class Player extends PhysicsObject {
 
   standUp(): void {
     this.crouched = false;
-    this.boundingBox.height = Player.HEIGHT;
+    this.boundingBox.height = Player.STANDING_HEIGHT;
   }
 
   checkCollisionWithBall(ball: Ball): void {
     if (this.collidesWith(ball)) {
       this.resolveCollision(ball);
     }
+  }
+
+  calculatePlayerForceX(direction: number): number {
+    if (direction === 0) {
+      return 0;
+    }
+    const speedLimitFraction =
+      (this.velocity.x * direction) / config.player.maxVelocityX;
+    if (speedLimitFraction >= 1) {
+      return 0;
+    }
+    if (speedLimitFraction < 0) {
+      return direction * config.player.maxForceX;
+    }
+    return (1 - speedLimitFraction) * direction * config.player.maxForceX;
+  }
+
+  private updatePlayerMovement(input: Input): void {
+    let direction = 0;
+    if (input.left) {
+      direction -= 1;
+    }
+    if (input.right) {
+      direction += 1;
+    }
+    const forceX = this.calculatePlayerForceX(direction);
+    this.applyForce({ x: forceX, y: 0 });
   }
 
   resolveCollision(ball: Ball): void {
