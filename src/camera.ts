@@ -11,14 +11,16 @@ export class Camera {
   world: World;
   context: CanvasRenderingContext2D;
   scale: number;
+  fixedDeltaTime: number;
 
   constructor(world: World, context: CanvasRenderingContext2D, scale: number) {
     this.world = world;
     this.context = context;
     this.scale = scale;
+    this.fixedDeltaTime = config.fixedDeltaTime;
   }
 
-  render(objects: PhysicsObject[]): void {
+  render(objects: PhysicsObject[], alpha: number): void {
     this.context.clearRect(
       0,
       0,
@@ -61,7 +63,6 @@ export class Camera {
     // this.context.clip();
 
     objects.forEach((object) => {
-      console.log('OBJECT', object);
       let color = 'black';
       if (object instanceof Ball) {
         color = 'red';
@@ -79,9 +80,19 @@ export class Camera {
         }
       }
       this.context.fillStyle = color;
+      // Interpolate positions between physics updates
+      const x =
+        object.position.x * alpha +
+        (object.position.x - object.velocity.x * this.fixedDeltaTime) *
+          (1 - alpha);
+      const y =
+        object.position.y * alpha +
+        (object.position.y - object.velocity.y * this.fixedDeltaTime) *
+          (1 - alpha);
+
       this.context.fillRect(
-        object.position.x * this.scale,
-        object.position.y * this.scale,
+        x * this.scale,
+        y * this.scale,
         object.boundingBox.width * this.scale,
         object.boundingBox.height * this.scale,
       );
