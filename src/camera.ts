@@ -1,26 +1,39 @@
 // src/camera.ts
-import { World } from "./world";
+import { Game } from "./game";
 import { PhysicsObject } from "./physics_object";
 import { Ball } from "./ball";
 import { Player } from "./player";
 import { Goal } from "./goal";
 import { Bubble } from "./bubble";
 import { config } from "./config";
+import { Point } from "./point";
 
 export class Camera {
-  world: World;
+  game: Game;
   context: CanvasRenderingContext2D;
   scale: number;
   fixedDeltaTime: number;
 
-  constructor(world: World, context: CanvasRenderingContext2D, scale: number) {
-    this.world = world;
+  constructor(game: Game, context: CanvasRenderingContext2D, scale: number) {
+    this.game = game;
     this.context = context;
     this.scale = scale;
     this.fixedDeltaTime = config.fixedDeltaTime;
   }
+  private interpolatePosition(position: Point, velocity: Point, alpha: number): Point {
+    return {
+      x: position.x * alpha + (position.x - velocity.x * this.fixedDeltaTime) * (1 - alpha),
+      y: position.y * alpha + (position.y - velocity.y * this.fixedDeltaTime) * (1 - alpha),
+    }
+  }
 
-  render(objects: PhysicsObject[], alpha: number): void {
+  render(
+    players: Player[],
+    goals: Goal[],
+    barriers: PhysicsObject[],
+    ball: Ball,
+    alpha: number,
+  ): void {
     this.context.clearRect(
       0,
       0,
@@ -33,71 +46,64 @@ export class Camera {
     this.context.scale(1, -1);
     this.context.translate(0, -this.context.canvas.height);
 
-    const scaledWorldWidth = this.world.width * this.scale;
-    const scaledWorldHeight = this.world.height * this.scale;
+    const scaledWorldWidth = this.game.getWorldWidth() * this.scale;
+    const scaledWorldHeight = this.game.getWorldHeight() * this.scale;
     this.context.clearRect(0, 0, scaledWorldWidth, scaledWorldHeight);
 
-     // Draw rounded corners
-    const cornerRadius = config.boundary.cornerRadius * this.scale;
-    const boundaryWidth = config.boundary.width * this.scale;
-    this.context.beginPath();
-    this.context.fillStyle = 'black'
-    this.context.arc(boundaryWidth + cornerRadius, cornerRadius, cornerRadius, Math.PI, 1.5 * Math.PI);
-    this.context.closePath();
-    this.context.fill();
-
-    this.context.beginPath();
-    this.context.arc(scaledWorldWidth - cornerRadius - boundaryWidth, cornerRadius, cornerRadius, 1.5 * Math.PI, 2 * Math.PI);
-    this.context.fill();
-    this.context.closePath();
-
-    this.context.beginPath();
-    this.context.arc(scaledWorldWidth - cornerRadius - boundaryWidth, scaledWorldHeight - cornerRadius, cornerRadius, 0, 0.5 * Math.PI);
-    this.context.fill();
-    this.context.closePath();
-
-    this.context.beginPath();
-    this.context.arc(boundaryWidth + cornerRadius, scaledWorldHeight - cornerRadius, cornerRadius, 0.5 * Math.PI, Math.PI);
-    this.context.fill();
-    this.context.closePath();
-    // this.context.clip();
-
-    objects.forEach((object) => {
-      let color = 'black';
-      if (object instanceof Ball) {
-        color = 'red';
-      } else if (object instanceof Player) {
-        if (object.id === 1) {
-          color = 'blue';
-        } else if (object.id === 2) {
-          color = 'green';
-        }
-      } else if (object instanceof Goal) {
-        if (object.player === 1) {
-          color = 'blue';
-        } else if (object.player === 2) {
-          color = 'green';
-        }
-      }
+    players.forEach((player) => {
+      let color = player.id === 1 ? 'blue' : 'green';
       this.context.fillStyle = color;
       // Interpolate positions between physics updates
-      const x =
-        object.position.x * alpha +
-        (object.position.x - object.velocity.x * this.fixedDeltaTime) *
-          (1 - alpha);
-      const y =
-        object.position.y * alpha +
-        (object.position.y - object.velocity.y * this.fixedDeltaTime) *
-          (1 - alpha);
-
+      const {x, y} = this.interpolatePosition(player.position, player.velocity, alpha);
       this.context.fillRect(
         x * this.scale,
         y * this.scale,
-        object.boundingBox.width * this.scale,
-        object.boundingBox.height * this.scale,
+        player.boundingBox.width * this.scale,
+        player.boundingBox.height * this.scale,
+      );
+      
+      if (player.bubble) {
+        // Draw bubbles
+        this.context.lineWidth = 1;
+        this.context.strokeStyle = color;
+        
+        this.context.beginPath();
+        this.context.arc(player.bubble.position.x, player.bubble.position.y, player.bubble.radius, 0, 2 * Math.PI);
+        this.context.stroke();
+      }
+    });
+
+
+    // Draw the Ball
+    this.context.fillStyle = 'black';
+    
+    this.context.beginPath();
+    this.context.arc(ball.position.x, ball.position.y, ball.radius, 0, 2 * Math.PI);
+    this.context.fill();
+
+    barriers.forEach((barrier) => {
+      const color = 'grey'
+      this.context.fillStyle = color;
+      // Interpolate positions between physics updates
+      this.context.fillRect(
+        barrier.position.x * this.scale,
+        barrier.position.y * this.scale,
+        barrier.boundingBox.width * this.scale,
+        barrier.boundingBox.height * this.scale,
       );
     });
 
+    goals.forEach((goal) => {
+      const color = goal.playerId === 1 ? 'blue' : 'green'
+      this.context.fillStyle = color;
+      // Interpolate positions between physics updates
+      this.context.fillRect(
+        goal.position.x * this.scale,
+        goal.position.y * this.scale,
+        goal.boundingBox.width * this.scale,
+        goal.boundingBox.height * this.scale,
+      );
+    });
 
     this.context.restore();
   }

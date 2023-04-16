@@ -8,7 +8,7 @@ export const config = {
   player: {
     mass: 100,
     width: 60,
-    height: 30,
+    standingHeight: 30,
     crouchedHeight: 20,
     maxForceX: 100000,
     maxVelocityX: 300,
