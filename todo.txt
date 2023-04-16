@@ -1,0 +1,2 @@
+- Collision boundaries (apply to all 4 sides of rectangle)
+- Arc boundaries (corners of arena and inside goal area)
