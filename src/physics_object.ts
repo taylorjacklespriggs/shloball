@@ -11,6 +11,7 @@ export class PhysicsObject {
   boundingBox: { width: number; height: number };
   world: World;
   isStatic: boolean;
+  bounceElasticity: number;
 
   constructor(
     world: World,
@@ -19,7 +20,8 @@ export class PhysicsObject {
     y: number,
     width: number,
     height: number,
-    isStatic: boolean = false,
+    isStatic = false,
+    bounceElasticity = 0
   ) {
     this.mass = mass;
     this.position = { x: x, y: y };
@@ -28,6 +30,7 @@ export class PhysicsObject {
     this.boundingBox = { width: width, height: height };
     this.world = world;
     this.isStatic = isStatic;
+    this.bounceElasticity = bounceElasticity;
   }
 
   applyForce(force: { x: number; y: number }): void {
@@ -73,13 +76,23 @@ export class PhysicsObject {
         this.position.x < 0 ||
         this.position.x + this.boundingBox.width > this.world.width
       ) {
-        this.velocity.x = -this.velocity.x;
+        this.velocity.x = -this.bounceElasticity * this.velocity.x;
+        if (this.position.x < 0) {
+          this.position.x = 0;
+        } else {
+          this.position.x = this.world.width - this.boundingBox.width;
+        }
       }
       if (
         this.position.y < 0 ||
         this.position.y + this.boundingBox.height > this.world.height
       ) {
-        this.velocity.y = -this.velocity.y;
+        this.velocity.y = -this.bounceElasticity * this.velocity.y;
+        if (this.position.y < 0) {
+          this.position.y = 0;
+        } else {
+          this.position.y = this.world.height - this.boundingBox.height;
+        }
       }
     }
   }
