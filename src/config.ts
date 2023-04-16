@@ -6,7 +6,7 @@ export const config = {
     friction: 0.1,
   },
   player: {
-    mass: 2,
+    mass: 100,
     width: 60,
     height: 30,
     crouchedHeight: 20,
@@ -22,4 +22,5 @@ export const config = {
     growthTime: 500,
     lifetime: 10000,
   },
+  fixedDeltaTime: 1 / 60, // 60 physics updates per second
 };
