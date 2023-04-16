@@ -20,4 +20,10 @@ export class World {
       object.position.y + object.boundingBox.height > this.height
     );
   }
+
+  // TODO: Implement this method
+  removeObject(object: PhysicsObject): void {}
+  
+  // TODO: Implement this method
+  addObject(object: PhysicsObject): void {}
 }
