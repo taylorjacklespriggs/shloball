@@ -22,5 +22,13 @@ export const config = {
     growthTime: 500,
     lifetime: 10000,
   },
+  goal: {
+    height: 180,
+    width: 20,
+  },
+  boundary: {
+    width: 20,
+    cornerRadius: 30,
+  },
   fixedDeltaTime: 1 / 60, // 60 physics updates per second
 };

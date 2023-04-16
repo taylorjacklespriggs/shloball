@@ -1,6 +1,7 @@
 import { Point } from "./point";
 import { World } from "./world";
 import { config } from "./config";
+import { Input } from "./types";
 
 export class PhysicsObject {
   mass: number;
@@ -9,6 +10,7 @@ export class PhysicsObject {
   acceleration: Point;
   boundingBox: { width: number; height: number };
   world: World;
+  isStatic: boolean;
 
   constructor(
     world: World,
@@ -16,7 +18,8 @@ export class PhysicsObject {
     x: number,
     y: number,
     width: number,
-    height: number
+    height: number,
+    isStatic: boolean = false,
   ) {
     this.mass = mass;
     this.position = { x: x, y: y };
@@ -24,6 +27,7 @@ export class PhysicsObject {
     this.acceleration = { x: 0, y: 0 };
     this.boundingBox = { width: width, height: height };
     this.world = world;
+    this.isStatic = isStatic;
   }
 
   applyForce(force: { x: number; y: number }): void {
@@ -31,7 +35,7 @@ export class PhysicsObject {
     this.acceleration.y += force.y / this.mass;
   }
 
-  update(deltaTime: number): void {
+  update(deltaTime: number, input?: Input): void {
     // Update velocity based on acceleration
     this.velocity.x += this.acceleration.x * deltaTime;
     this.velocity.y += this.acceleration.y * deltaTime;
