@@ -1,4 +1,5 @@
 import { Point } from "./point";
+import { World } from "./world";
 
 export class PhysicsObject {
   mass: number;
@@ -6,8 +7,10 @@ export class PhysicsObject {
   velocity: Point;
   acceleration: Point;
   boundingBox: { width: number; height: number };
+  world: World;
 
   constructor(
+    world: World,
     mass: number,
     x: number,
     y: number,
@@ -19,6 +22,7 @@ export class PhysicsObject {
     this.velocity = { x: 0, y: 0 };
     this.acceleration = { x: 0, y: 0 };
     this.boundingBox = { width: width, height: height };
+    this.world = world;
   }
 
   applyForce(force: { x: number; y: number }): void {
@@ -52,5 +56,22 @@ export class PhysicsObject {
 
   resolveCollision(other: PhysicsObject): void {
     // Implement collision resolution based on the specific game object types
+  }
+
+  handleBoundaryCollision(): void {
+    if (this.world.isOutOfBounds(this)) {
+      if (
+        this.position.x < 0 ||
+        this.position.x + this.boundingBox.width > this.world.width
+      ) {
+        this.velocity.x = -this.velocity.x;
+      }
+      if (
+        this.position.y < 0 ||
+        this.position.y + this.boundingBox.height > this.world.height
+      ) {
+        this.velocity.y = -this.velocity.y;
+      }
+    }
   }
 }
