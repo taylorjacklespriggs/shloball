@@ -1,5 +1,6 @@
 // src/main.ts
 import { World } from "./world";
+import { Point } from "./point";
 import { Camera } from "./camera";
 import { PhysicsObject } from "./physics_object";
 import { Player } from "./player";
@@ -77,6 +78,49 @@ window.onload = () => {
   let accumulator = 0;
   const fixedDeltaTime = 1 / 60;
 
+  const keyStates: { [key: string]: boolean } = {}; // Object to keep track of key states
+
+  document.addEventListener("keydown", (event) => {
+    keyStates[event.key] = true; // Set the key state to true when it's pressed
+  });
+
+  document.addEventListener("keyup", (event) => {
+    keyStates[event.key] = false; // Set the key state to false when it's released
+  });
+
+  function calculatePlayerForceX(player: Player, direction: number): number {
+    if (direction === 0) {
+      return 0;
+    }
+    const speedLimitFraction =
+      (player.velocity.x * direction) / config.player.maxVelocityX;
+    if (speedLimitFraction >= 1) {
+      return 0;
+    }
+    if (speedLimitFraction < 0) {
+      return direction * config.player.maxForceX;
+    }
+    return (1 - speedLimitFraction) * direction * config.player.maxForceX;
+  }
+
+  function updatePlayerMovement(): void {
+    // Update player movement based on keyboard input
+    [
+      { player: player1, keys: [keyStates.a, keyStates.d] },
+      { player: player2, keys: [keyStates.ArrowLeft, keyStates.ArrowRight] },
+    ].forEach(({ player, keys: [leftKey, rightKey] }) => {
+      let direction = 0;
+      if (leftKey) {
+        direction -= 1;
+      }
+      if (rightKey) {
+        direction += 1;
+      }
+      const forceX = calculatePlayerForceX(player, direction);
+      player.applyForce({ x: forceX, y: 0 });
+    });
+  }
+
   function gameLoop(timestamp: number): void {
     const frameTime = Math.min((timestamp - lastTimestamp) / 1000, 1 / 20); // Convert to seconds
     lastTimestamp = timestamp;
@@ -84,6 +128,8 @@ window.onload = () => {
 
     if (!isPaused) {
       while (accumulator >= fixedDeltaTime) {
+        updatePlayerMovement();
+
         // Update physics objects
         objects.forEach((object) => {
           if (!object.isStatic) {
@@ -101,6 +147,7 @@ window.onload = () => {
 
         accumulator -= fixedDeltaTime;
       }
+      console.log(player1);
     }
 
     camera.render(objects, accumulator / fixedDeltaTime);

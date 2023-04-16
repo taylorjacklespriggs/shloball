@@ -10,6 +10,8 @@ export const config = {
     width: 60,
     height: 30,
     crouchedHeight: 20,
+    maxForceX: 100000,
+    maxVelocityX: 300,
   },
   ball: {
     mass: 1,
