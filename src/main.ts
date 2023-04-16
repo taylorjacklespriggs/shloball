@@ -29,9 +29,6 @@ window.onload = () => {
 
   document.body.appendChild(canvas);
 
-  const worldWidth = 2000;
-  const worldHeight = 1000;
-
   const world = new World(worldWidth, worldHeight, config.world.gravity);
   const camera = new Camera(
     world,
