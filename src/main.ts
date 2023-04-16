@@ -147,7 +147,6 @@ window.onload = () => {
 
         accumulator -= fixedDeltaTime;
       }
-      console.log(player1);
     }
 
     camera.render(objects, accumulator / fixedDeltaTime);
