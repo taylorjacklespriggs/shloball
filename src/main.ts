@@ -45,7 +45,7 @@ window.onload = () => {
   let lastTimestamp = 0;
 
   function gameLoop(timestamp: number): void {
-    const deltaTime = (timestamp - lastTimestamp) / 1000; // Convert to seconds
+    const deltaTime = Math.min((timestamp - lastTimestamp) / 1000, 1 / 20); // Convert to seconds
     lastTimestamp = timestamp;
 
     if (!isPaused) {
