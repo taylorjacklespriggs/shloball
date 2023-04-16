@@ -3,6 +3,7 @@ export const config = {
     width: 960,
     height: 540,
     gravity: { x: 0, y: -40 },
+    friction: 0.1,
   },
   player: {
     mass: 2,
