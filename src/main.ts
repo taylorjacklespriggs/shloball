@@ -2,6 +2,10 @@
 import { World } from "./world";
 import { Camera } from "./camera";
 import { PhysicsObject } from "./physics_object";
+import { config } from "./config";
+
+const worldWidth = config.world.width;
+const worldHeight = config.world.height;
 
 window.onload = () => {
   let isPaused = false;
@@ -28,7 +32,7 @@ window.onload = () => {
   const worldWidth = 2000;
   const worldHeight = 1000;
 
-  const world = new World(worldWidth, worldHeight, { x: 0, y: -10 });
+  const world = new World(worldWidth, worldHeight, config.world.gravity);
   const camera = new Camera(
     world,
     context,
@@ -39,8 +43,26 @@ window.onload = () => {
 
   // Populate objects array with instances of PhysicsObject as needed
   // Example:
-  objects.push(new PhysicsObject(world, 1, 100, 100, 50, 50));
-  objects.push(new PhysicsObject(world, 1, 200, 200, 50, 50));
+  objects.push(
+    new PhysicsObject(
+      world,
+      config.player.mass,
+      100,
+      100,
+      config.player.width,
+      config.player.height
+    )
+  );
+  objects.push(
+    new PhysicsObject(
+      world,
+      config.ball.mass,
+      200,
+      200,
+      config.ball.width,
+      config.ball.height
+    )
+  );
 
   let lastTimestamp = 0;
 
