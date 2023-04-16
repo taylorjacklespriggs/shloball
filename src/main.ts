@@ -2,10 +2,9 @@
 import { World } from "./world";
 import { Camera } from "./camera";
 import { PhysicsObject } from "./physics_object";
+import { Player } from "./player";
+import { Ball } from "./ball";
 import { config } from "./config";
-
-const worldWidth = config.world.width;
-const worldHeight = config.world.height;
 
 window.onload = () => {
   let isPaused = false;
@@ -24,42 +23,27 @@ window.onload = () => {
     return;
   }
 
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  canvas.width = config.world.width;
+  canvas.height = config.world.height;
 
   document.body.appendChild(canvas);
 
-  const world = new World(worldWidth, worldHeight, config.world.gravity);
+  const world = new World(config.world.width, config.world.height, config.world.gravity);
   const camera = new Camera(
     world,
     context,
-    Math.min(canvas.width / worldWidth, canvas.height / worldHeight)
+    Math.min(canvas.width / world.width, canvas.height / world.height)
   );
 
   const objects: PhysicsObject[] = []; // List of physics objects to render and update
 
-  // Populate objects array with instances of PhysicsObject as needed
-  // Example:
-  objects.push(
-    new PhysicsObject(
-      world,
-      config.player.mass,
-      100,
-      100,
-      config.player.width,
-      config.player.height
-    )
-  );
-  objects.push(
-    new PhysicsObject(
-      world,
-      config.ball.mass,
-      200,
-      200,
-      config.ball.width,
-      config.ball.height
-    )
-  );
+  const player1 = new Player(world, 40, 20);
+  const player2 = new Player(world, world.width - Player.WIDTH - 40, 20);
+  const ball = new Ball(world, world.width / 2 - 15, world.width / 2 - 15);
+
+  objects.push(player1);
+  objects.push(player2);
+  objects.push(ball);
 
   let lastTimestamp = 0;
 

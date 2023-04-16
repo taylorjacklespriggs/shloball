@@ -1,17 +1,24 @@
 export const config = {
   world: {
-    width: 2000,
-    height: 1000,
-    gravity: { x: 0, y: -9.81 },
+    width: 960,
+    height: 540,
+    gravity: { x: 0, y: -40 },
   },
   player: {
-    mass: 1,
-    width: 50,
-    height: 50,
+    mass: 2,
+    width: 60,
+    height: 30,
+    crouchedHeight: 20,
   },
   ball: {
     mass: 1,
-    width: 50,
-    height: 50,
+    radius: 15,
+  },
+  bubble: {
+    mass: 0,
+    startRadius: 5,
+    endRadius: 30,
+    growthTime: 500,
+    lifetime: 10000,
   },
 };
