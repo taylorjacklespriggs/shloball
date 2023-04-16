@@ -14,7 +14,7 @@ export class Bubble extends PhysicsObject {
     const mass = 0; // Bubble doesn't have any mass
     const width = Bubble.START_RADIUS * 2;
     const height = Bubble.START_RADIUS * 2;
-    super(world, mass, x, y, width, height);
+    super(world, mass, x, y, width, height, true);
     this.timer = 0;
   }
 

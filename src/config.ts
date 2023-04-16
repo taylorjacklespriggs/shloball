@@ -22,4 +22,12 @@ export const config = {
     growthTime: 500,
     lifetime: 10000,
   },
+  goal: {
+    height: 180,
+    width: 20,
+  },
+  boundary: {
+    width: 20,
+    cornerRadius: 30,
+  }
 };
