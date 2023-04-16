@@ -1,5 +1,6 @@
 import { Point } from "./point";
 import { World } from "./world";
+import { config } from "./config";
 
 export class PhysicsObject {
   mass: number;
@@ -34,6 +35,10 @@ export class PhysicsObject {
     // Update velocity based on acceleration
     this.velocity.x += this.acceleration.x * deltaTime;
     this.velocity.y += this.acceleration.y * deltaTime;
+
+    // Apply friction
+    this.velocity.x *= 1 - config.world.friction * deltaTime;
+    this.velocity.y *= 1 - config.world.friction * deltaTime;
 
     // Update position based on velocity
     this.position.x += this.velocity.x * deltaTime;
