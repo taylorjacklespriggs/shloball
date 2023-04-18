@@ -96,8 +96,8 @@ export class Camera {
 
     this.context.beginPath();
     this.context.arc(
-      ball.position.x,
-      ball.position.y,
+      ball.position.x + ball.radius,
+      ball.position.y + ball.radius,
       ball.radius,
       0,
       2 * Math.PI

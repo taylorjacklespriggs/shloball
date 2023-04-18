@@ -56,18 +56,8 @@ export class PhysicsObject {
     this.acceleration.y = 0;
   }
 
-  collidesWith(other: PhysicsObject): boolean {
-    // AABB collision detection
-    return (
-      this.position.x < other.position.x + other.boundingBox.width &&
-      this.position.x + this.boundingBox.width > other.position.x &&
-      this.position.y < other.position.y + other.boundingBox.height &&
-      this.position.y + this.boundingBox.height > other.position.y
-    );
-  }
-
-  resolveCollision(other: PhysicsObject): void {
-    // Implement collision resolution based on the specific game object types
+  collideAndResolve(other: PhysicsObject) {
+    return false;
   }
 
   handleBoundaryCollision(): void {
