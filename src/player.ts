@@ -141,6 +141,21 @@ export class Player extends PhysicsObject {
         return true;
       }
     } else if (other instanceof Player) {
+      const dx = this.position.x - other.position.x;
+      const depth =
+        this.boundingBox.width / 2 + other.boundingBox.width / 2 - Math.abs(dx);
+      if (depth > 0) {
+        this.lerpPosition({ x: 1, y: 0 }, -depth * 0.5);
+        other.lerpPosition({ x: 1, y: 0 }, depth * 0.5);
+        const totalMass = this.mass + other.mass;
+        const impulse = (this.velocity.x - other.velocity.x) / totalMass;
+        if (dx * impulse > 0) {
+          return false;
+        }
+        this.velocity.x -= impulse * other.mass;
+        other.velocity.x += impulse * this.mass;
+        return true;
+      }
       // TODO: Implement pill-pill collision
       return false;
     } else {

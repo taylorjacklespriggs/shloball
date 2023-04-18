@@ -224,6 +224,8 @@ export class Game {
           player.collideAndResolve(this.ball);
         });
 
+        this.player1.collideAndResolve(this.player2);
+
         this.accumulator -= this.fixedDeltaTime;
       }
     }
