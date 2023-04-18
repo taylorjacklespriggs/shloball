@@ -60,17 +60,48 @@ export class Camera {
     players.forEach((player) => {
       const color = player.id === 1 ? "blue" : "green";
       this.context.fillStyle = color;
+      this.context.strokeStyle = color;
       // Interpolate positions between physics updates
       const { x, y } = this.interpolatePosition(
         player.position,
         player.velocity,
         alpha
       );
+      const leftCirclePosition = {
+        x: x - player.boundingBox.width / 2 + player.boundingBox.height / 2,
+        y,
+      };
+      const rightCirclePosition = {
+        x: x + player.boundingBox.width / 2 - player.boundingBox.height / 2,
+        y,
+      };
+      const rectDim = {
+        width: player.boundingBox.width - player.boundingBox.height,
+        height: player.boundingBox.height,
+      };
+      this.context.beginPath();
+      this.context.arc(
+        leftCirclePosition.x * this.scale,
+        leftCirclePosition.y * this.scale,
+        (player.boundingBox.height / 2) * this.scale,
+        Math.PI * 0.5,
+        Math.PI * 1.5
+      );
+      this.context.fill();
+      this.context.beginPath();
+      this.context.arc(
+        rightCirclePosition.x * this.scale,
+        rightCirclePosition.y * this.scale,
+        (player.boundingBox.height / 2) * this.scale,
+        -Math.PI * 0.5,
+        Math.PI * 0.5
+      );
+      this.context.fill();
       this.context.fillRect(
-        (x - player.boundingBox.width / 2) * this.scale,
-        (y - player.boundingBox.height / 2) * this.scale,
-        player.boundingBox.width * this.scale,
-        player.boundingBox.height * this.scale
+        (x - rectDim.width / 2 - 1) * this.scale,
+        (y - rectDim.height / 2) * this.scale,
+        (rectDim.width + 2) * this.scale,
+        rectDim.height * this.scale
       );
 
       if (player.bubble) {

@@ -133,7 +133,7 @@ export class Player extends PhysicsObject {
           return false; // Objects are moving away from each other
         }
 
-        const restitution = 0.8;
+        const restitution = config.player.ballCollisionRestitution;
         const impulse = (-(1 + restitution) * speed) / (this.mass + other.mass);
         const impulseVector = {
           x: impulse * normal.x,

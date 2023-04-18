@@ -3,18 +3,19 @@ export const config = {
     width: 960,
     height: 540,
     gravity: { x: 0, y: -300 },
-    friction: 0.1,
+    friction: 0.01,
   },
   player: {
-    mass: 10,
+    mass: 4,
     width: 60,
     standingHeight: 30,
     crouchedHeight: 20,
-    maxForceX: 50000,
+    maxForceX: 10000,
     maxVelocityX: 300,
+    ballCollisionRestitution: 0.95,
   },
   ball: {
-    mass: 0.1,
+    mass: 1,
     radius: 15,
   },
   bubble: {
