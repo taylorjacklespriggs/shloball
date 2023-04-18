@@ -103,6 +103,7 @@ export class Camera {
     );
     this.context.fill();
 
+    /*
     barriers.forEach((barrier) => {
       const color = "grey";
       this.context.fillStyle = color;
@@ -114,6 +115,7 @@ export class Camera {
         barrier.boundingBox.height * this.scale
       );
     });
+    */
 
     goals.forEach((goal) => {
       const color = goal.playerId === 1 ? "blue" : "green";

@@ -12,15 +12,6 @@ export class World {
     this.gravity = { ...gravity };
   }
 
-  isOutOfBounds(object: PhysicsObject): boolean {
-    return (
-      object.position.x < 0 ||
-      object.position.x + object.boundingBox.width > this.width ||
-      object.position.y < 0 ||
-      object.position.y + object.boundingBox.height > this.height
-    );
-  }
-
   // TODO: Implement this method
   removeObject(object: PhysicsObject): void {}
   

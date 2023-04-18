@@ -113,7 +113,6 @@ export class Player extends PhysicsObject {
 
       if (collision) {
         const { normal, depth } = collision;
-        console.log(normal);
         this.lerpPosition(normal, -depth * 0.5);
         other.lerpPosition(normal, depth * 0.5);
         const relativeVelocity = {
