@@ -6,15 +6,15 @@ export const config = {
     friction: 0.1,
   },
   player: {
-    mass: 100,
+    mass: 10,
     width: 60,
     standingHeight: 30,
     crouchedHeight: 20,
-    maxForceX: 100000,
+    maxForceX: 50000,
     maxVelocityX: 300,
   },
   ball: {
-    mass: 1,
+    mass: 0.1,
     radius: 15,
   },
   bubble: {
@@ -32,5 +32,5 @@ export const config = {
     width: 20,
     cornerRadius: 30,
   },
-  fixedDeltaTime: 1 / 60, // 60 physics updates per second
+  fixedDeltaTime: 1 / 180, // 180 physics updates per second
 };

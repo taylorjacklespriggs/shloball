@@ -7,6 +7,19 @@ import { Ball } from "./ball";
 import { config } from "./config";
 import { Goal } from "./goal";
 
+const ballStart = {
+  x: config.world.width / 2 - 15,
+  y: config.world.width / 2 - 15,
+};
+const player1Start = {
+  x: 0.25 * config.world.width,
+  y: 3 * config.boundary.width,
+};
+const player2Start = {
+  x: 0.75 * config.world.width - config.player.width,
+  y: 3 * config.boundary.width,
+};
+
 export class Game {
   private world: World;
   public camera: Camera;
@@ -37,7 +50,7 @@ export class Game {
 
     this.lastTimeStamp = 0;
     this.accumulator = 0;
-    this.fixedDeltaTime = 1 / 60;
+    this.fixedDeltaTime = config.fixedDeltaTime;
     this.keyStates = {};
     this.world = new World(
       config.world.width,
@@ -55,18 +68,8 @@ export class Game {
     );
 
     const boundaryWidth = config.boundary.width;
-    this.player1 = new Player(
-      this,
-      0.25 * this.world.width,
-      3 * boundaryWidth,
-      1
-    );
-    this.player2 = new Player(
-      this,
-      0.75 * this.world.width - config.player.width,
-      3 * boundaryWidth,
-      2
-    );
+    this.player1 = new Player(this, player1Start.x, player1Start.y, 1);
+    this.player2 = new Player(this, player2Start.x, player2Start.y, 2);
     const goalHeight = config.goal.height;
     const goalWidth = config.goal.width;
     const goalY = (this.world.height - goalHeight) / 2;
@@ -79,11 +82,7 @@ export class Game {
       goalHeight,
       2
     );
-    this.ball = new Ball(
-      this.world,
-      this.world.width / 2 - 15,
-      this.world.width / 2 - 15
-    );
+    this.ball = new Ball(this.world, ballStart.x, ballStart.y);
 
     // Create boundaries
     const topBoundary = new PhysicsObject(
@@ -173,7 +172,11 @@ export class Game {
   }
 
   public unpause(): void {
-    this.isPaused = false;
+    requestAnimationFrame((timestamp: number) => {
+      this.isPaused = false;
+      this.lastTimeStamp = timestamp;
+      requestAnimationFrame(this.gameLoop.bind(this));
+    });
   }
 
   public getWorld(): World {
@@ -197,37 +200,39 @@ export class Game {
     this.lastTimeStamp = timestamp;
     this.accumulator += frameTime;
 
-    if (!this.isPaused) {
-      while (this.accumulator >= this.fixedDeltaTime) {
-        // update players
-        this.player1.update(this.fixedDeltaTime, {
-          left: this.keyStates.a,
-          right: this.keyStates.d,
-        });
-        this.player1.handleBoundaryCollision();
+    if (this.isPaused) {
+      return;
+    }
 
-        this.player2.update(this.fixedDeltaTime, {
-          left: this.keyStates.ArrowLeft,
-          right: this.keyStates.ArrowRight,
-        });
-        this.player2.handleBoundaryCollision();
+    while (this.accumulator >= this.fixedDeltaTime) {
+      // update players
+      this.player1.update(this.fixedDeltaTime, {
+        left: this.keyStates.a,
+        right: this.keyStates.d,
+      });
+      this.player1.handleBoundaryCollision();
 
-        // update ball
-        this.ball.update(this.fixedDeltaTime);
-        this.goal1.collideAndResolve(this.ball);
-        this.goal2.collideAndResolve(this.ball);
+      this.player2.update(this.fixedDeltaTime, {
+        left: this.keyStates.ArrowLeft,
+        right: this.keyStates.ArrowRight,
+      });
+      this.player2.handleBoundaryCollision();
 
-        this.ball.handleBoundaryCollision();
+      // update ball
+      this.ball.update(this.fixedDeltaTime);
+      this.goal1.collideAndResolve(this.ball);
+      this.goal2.collideAndResolve(this.ball);
 
-        // Check for collisions between the players and the ball
-        [this.player1, this.player2].forEach((player) => {
-          player.collideAndResolve(this.ball);
-        });
+      this.ball.handleBoundaryCollision();
 
-        this.player1.collideAndResolve(this.player2);
+      // Check for collisions between the players and the ball
+      [this.player1, this.player2].forEach((player) => {
+        player.collideAndResolve(this.ball);
+      });
 
-        this.accumulator -= this.fixedDeltaTime;
-      }
+      this.player1.collideAndResolve(this.player2);
+
+      this.accumulator -= this.fixedDeltaTime;
     }
 
     this.render(this.accumulator / this.fixedDeltaTime);
@@ -244,6 +249,12 @@ export class Game {
   public playerScored(playerId: number): void {
     if (playerId === 1) this.player1Score++;
     else this.player2Score++;
+    [this.ball, this.player1, this.player2].forEach((physObj) => {
+      physObj.velocity = { x: 0, y: 0 };
+    });
+    this.ball.position = { ...ballStart };
+    this.player1.position = { ...player1Start };
+    this.player2.position = { ...player2Start };
     this.pause();
     setTimeout(() => this.unpause(), 3000);
   }

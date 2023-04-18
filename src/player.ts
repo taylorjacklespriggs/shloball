@@ -74,7 +74,14 @@ export class Player extends PhysicsObject {
 
   calculatePlayerForceX(direction: number): number {
     if (direction === 0) {
-      return 0;
+      return Math.max(
+        Math.min(
+          (-this.velocity.x * config.player.maxForceX) /
+            config.player.maxVelocityX,
+          config.player.maxForceX
+        ),
+        -config.player.maxForceX
+      );
     }
     const speedLimitFraction =
       (this.velocity.x * direction) / config.player.maxVelocityX;
