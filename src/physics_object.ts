@@ -56,6 +56,11 @@ export class PhysicsObject {
     this.acceleration.y = 0;
   }
 
+  lerpPosition(normal: Point, distance: number) {
+    this.position.x += normal.x * distance;
+    this.position.y += normal.y * distance;
+  }
+
   collideAndResolve(other: PhysicsObject) {
     return false;
   }

@@ -2,10 +2,10 @@ import {
   Circle,
   CollisionResult,
   Rect,
-  circleRectangleCollision,
+  getCircleRectangleCollision,
 } from "../collisions";
 
-describe("circleRectangleCollision", () => {
+describe("getCircleRectangleCollision", () => {
   it("should return null when the circle is far from the rectangle", () => {
     const farCircle: Circle = {
       position: { x: 10, y: 10 },
@@ -15,7 +15,7 @@ describe("circleRectangleCollision", () => {
       position: { x: 0, y: 0 },
       boundingBox: { width: 2, height: 2 },
     };
-    const result = circleRectangleCollision(farCircle, rect);
+    const result = getCircleRectangleCollision(farCircle, rect);
     expect(result).toBeNull();
   });
 
@@ -32,7 +32,7 @@ describe("circleRectangleCollision", () => {
       normal: { x: -0.7071067811865475, y: -0.7071067811865475 },
       depth: 0.5857864376269049,
     };
-    const result = circleRectangleCollision(cornerCircle, rect);
+    const result = getCircleRectangleCollision(cornerCircle, rect);
     expect(result?.normal.x).toBeCloseTo(expected.normal.x, 5);
     expect(result?.normal.y).toBeCloseTo(expected.normal.y, 5);
     expect(result?.depth).toBeCloseTo(expected.depth, 5);
@@ -51,7 +51,7 @@ describe("circleRectangleCollision", () => {
       normal: { x: -1, y: 0 },
       depth: 1,
     };
-    const result = circleRectangleCollision(flatFaceCircle, rect);
+    const result = getCircleRectangleCollision(flatFaceCircle, rect);
     expect(result?.normal.x).toBeCloseTo(expected.normal.x, 5);
     expect(result?.normal.y).toBeCloseTo(expected.normal.y, 5);
     expect(result?.depth).toBeCloseTo(expected.depth, 5);

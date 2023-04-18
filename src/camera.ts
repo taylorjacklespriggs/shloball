@@ -4,7 +4,6 @@ import { PhysicsObject } from "./physics_object";
 import { Ball } from "./ball";
 import { Player } from "./player";
 import { Goal } from "./goal";
-import { Bubble } from "./bubble";
 import { config } from "./config";
 import { Point } from "./point";
 
@@ -68,8 +67,8 @@ export class Camera {
         alpha
       );
       this.context.fillRect(
-        x * this.scale,
-        y * this.scale,
+        (x - player.boundingBox.width / 2) * this.scale,
+        (y - player.boundingBox.height / 2) * this.scale,
         player.boundingBox.width * this.scale,
         player.boundingBox.height * this.scale
       );
@@ -81,9 +80,9 @@ export class Camera {
 
         this.context.beginPath();
         this.context.arc(
-          player.bubble.position.x,
-          player.bubble.position.y,
-          player.bubble.radius,
+          player.bubble.position.x * this.scale,
+          player.bubble.position.y * this.scale,
+          player.bubble.radius * this.scale,
           0,
           2 * Math.PI
         );
@@ -96,9 +95,9 @@ export class Camera {
 
     this.context.beginPath();
     this.context.arc(
-      ball.position.x + ball.radius,
-      ball.position.y + ball.radius,
-      ball.radius,
+      ball.position.x * this.scale,
+      ball.position.y * this.scale,
+      ball.radius * this.scale,
       0,
       2 * Math.PI
     );

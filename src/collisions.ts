@@ -22,9 +22,10 @@ export interface CollisionResult {
 
 const epsilon = 1e-6;
 
-export function circleRectangleCollision(
+export function getCircleRectangleCollision(
   circle: Circle,
-  rect: Rect
+  rect: Rect,
+  reverse = false
 ): CollisionResult | null {
   // Calculate the closest point on the rectangle to the circle
   const closestX = Math.max(
@@ -56,6 +57,15 @@ export function circleRectangleCollision(
   // Calculate the collision depth
   const depth = circle.radius - distance;
 
+  if (reverse) {
+    return {
+      normal: {
+        x: -normal.x,
+        y: -normal.y,
+      },
+      depth,
+    };
+  }
   return { normal, depth };
 }
 
@@ -91,74 +101,64 @@ export function getPillCircleCollision(
   pill: Rect,
   circle: Circle
 ): CollisionResult | null {
-  const circleDistanceX = Math.abs(
-    circle.position.x - pill.position.x - pill.boundingBox.width / 2
-  );
-  const circleDistanceY = Math.abs(
-    circle.position.y - pill.position.y - pill.boundingBox.height / 2
-  );
+  const circleDistanceX = circle.position.x - pill.position.x;
+  const circleDistanceY = circle.position.y - pill.position.y;
 
-  if (circleDistanceX > pill.boundingBox.width / 2 + circle.radius) {
-    return null;
-  }
-  if (circleDistanceY > pill.boundingBox.height / 2 + circle.radius) {
+  if (
+    Math.abs(circleDistanceX) > pill.boundingBox.width / 2 + circle.radius ||
+    Math.abs(circleDistanceY) > pill.boundingBox.height / 2 + circle.radius
+  ) {
     return null;
   }
 
-  if (circleDistanceX <= pill.boundingBox.width / 2) {
-    return {
-      normal: {
-        x: 0,
-        y:
-          circle.position.y < pill.position.y + pill.boundingBox.height / 2
-            ? -1
-            : 1,
+  const pillCircleRadius = pill.boundingBox.height / 2;
+
+  const collisions: (CollisionResult | null)[] = [
+    getCircleCircleCollision(
+      {
+        position: {
+          x: pill.position.x - pill.boundingBox.width / 2 + pillCircleRadius,
+          y: pill.position.y,
+        },
+        radius: pillCircleRadius,
       },
-      depth: pill.boundingBox.height / 2 + circle.radius - circleDistanceY,
-    };
-  }
-
-  if (circleDistanceY <= pill.boundingBox.height / 2) {
-    return {
-      normal: {
-        x:
-          circle.position.x < pill.position.x + pill.boundingBox.width / 2
-            ? -1
-            : 1,
-        y: 0,
+      circle
+    ),
+    getCircleCircleCollision(
+      {
+        position: {
+          x: pill.position.x + pill.boundingBox.width / 2 - pillCircleRadius,
+          y: pill.position.y,
+        },
+        radius: pillCircleRadius,
       },
-      depth: pill.boundingBox.width / 2 + circle.radius - circleDistanceX,
-    };
-  }
+      circle
+    ),
+    getCircleRectangleCollision(
+      circle,
+      {
+        position: pill.position,
+        boundingBox: {
+          width: pill.boundingBox.width - pill.boundingBox.height,
+          height: pill.boundingBox.height,
+        },
+      },
+      true
+    ),
+  ];
 
-  const cornerDistanceSq =
-    (circleDistanceX - pill.boundingBox.width / 2) ** 2 +
-    (circleDistanceY - pill.boundingBox.height / 2) ** 2;
-
-  if (cornerDistanceSq <= circle.radius ** 2) {
-    const cornerDistance = Math.sqrt(cornerDistanceSq);
-    const depth = circle.radius - cornerDistance;
-
-    const normal = {
-      x:
-        circleDistanceX < circleDistanceY
-          ? circle.position.x < pill.position.x + pill.boundingBox.width / 2
-            ? -1
-            : 1
-          : 0,
-      y:
-        circleDistanceX < circleDistanceY
-          ? 0
-          : circle.position.y < pill.position.y + pill.boundingBox.height / 2
-          ? -1
-          : 1,
-    };
-
-    return {
-      normal,
-      depth,
-    };
-  }
-
-  return null;
+  let collision: CollisionResult | null = null;
+  collisions.forEach((candidate) => {
+    if (!candidate) {
+      return;
+    }
+    if (!collision) {
+      collision = candidate;
+      return;
+    }
+    if (candidate.depth > collision.depth) {
+      collision = candidate;
+    }
+  });
+  return collision;
 }

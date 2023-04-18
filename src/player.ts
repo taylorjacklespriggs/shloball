@@ -98,65 +98,6 @@ export class Player extends PhysicsObject {
     const forceX = this.calculatePlayerForceX(direction);
     this.applyForce({ x: forceX, y: 0 });
   }
-  private getCollisionNormal(other: PhysicsObject): Point | null {
-    if (other instanceof Player) {
-      // Pill-Pill collision
-      const dx =
-        this.position.x +
-        this.boundingBox.width / 2 -
-        (other.position.x + other.boundingBox.width / 2);
-      const dy =
-        this.position.y +
-        this.boundingBox.height / 2 -
-        (other.position.y + other.boundingBox.height / 2);
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      if (distance < (this.boundingBox.width + other.boundingBox.width) / 2) {
-        return { x: dx, y: dy };
-      }
-      return null;
-    } else if (other instanceof Ball) {
-      // Pill-Ball collision
-      const circleX = other.position.x + other.boundingBox.width / 2;
-      const circleY = other.position.y + other.boundingBox.height / 2;
-      const rectX = this.position.x;
-      const rectY = this.position.y;
-      const rectWidth = this.boundingBox.width;
-      const rectHeight = this.boundingBox.height;
-      const pillAspectRatio = 2;
-      const halfPillWidth = rectHeight / pillAspectRatio / 2;
-      const halfPillHeight = rectHeight / 2;
-      const circleDistanceX = Math.abs(
-        circleX - rectX - rectWidth / 2 - halfPillWidth
-      );
-      const circleDistanceY = Math.abs(circleY - rectY - rectHeight / 2);
-      if (circleDistanceX > halfPillWidth + other.boundingBox.width / 2) {
-        return null;
-      }
-      if (circleDistanceY > halfPillHeight + other.boundingBox.height / 2) {
-        return null;
-      }
-      if (circleDistanceX <= halfPillWidth) {
-        return { x: 0, y: circleY - rectY - rectHeight / 2 };
-      }
-      if (circleDistanceY <= halfPillHeight) {
-        return { x: circleX - rectX - rectWidth / 2 - halfPillWidth, y: 0 };
-      }
-      const cornerDistanceSq =
-        (circleDistanceX - halfPillWidth) ** 2 +
-        (circleDistanceY - halfPillHeight) ** 2;
-      if (cornerDistanceSq <= (other.boundingBox.width / 2) ** 2) {
-        const cornerDistance = Math.sqrt(cornerDistanceSq);
-        return {
-          x: circleX - rectX - rectWidth / 2 - halfPillWidth,
-          y: circleY - rectY - rectHeight / 2,
-        };
-      }
-      return null;
-    } else {
-      // Unsupported object type
-      return null;
-    }
-  }
 
   collideAndResolve(other: PhysicsObject) {
     if (other instanceof Ball) {
@@ -171,7 +112,10 @@ export class Player extends PhysicsObject {
       const collision = getPillCircleCollision(pill, circle);
 
       if (collision) {
-        const normal = collision.normal;
+        const { normal, depth } = collision;
+        console.log(normal);
+        this.lerpPosition(normal, -depth * 0.5);
+        other.lerpPosition(normal, depth * 0.5);
         const relativeVelocity = {
           x: other.velocity.x - this.velocity.x,
           y: other.velocity.y - this.velocity.y,

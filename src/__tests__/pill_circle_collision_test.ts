@@ -24,12 +24,12 @@ describe("getPillCircleCollision", () => {
 
   it("should return a collision when the circle collides with the semicircular end of the pill", () => {
     const circle: Circle = {
-      position: { x: 2.5, y: 1 },
+      position: { x: 2, y: 1 },
       radius: 0.5,
     };
     const pill: Rect = {
       position: { x: 0, y: 0 },
-      boundingBox: { width: 2, height: 2 },
+      boundingBox: { width: 4, height: 2 },
     };
     const expected: CollisionResult = {
       normal: { x: 1, y: 0 },
@@ -43,16 +43,16 @@ describe("getPillCircleCollision", () => {
 
   it("should return a collision when the circle collides with the flat edge of the pill", () => {
     const circle: Circle = {
-      position: { x: 1, y: 2.5 },
-      radius: 0.5,
+      position: { x: 0, y: 1.5 },
+      radius: 1,
     };
     const pill: Rect = {
       position: { x: 0, y: 0 },
-      boundingBox: { width: 2, height: 2 },
+      boundingBox: { width: 4, height: 2 },
     };
     const expected: CollisionResult = {
       normal: { x: 0, y: 1 },
-      depth: 0,
+      depth: 0.5,
     };
     const result = getPillCircleCollision(pill, circle);
     expect(result?.normal.x).toBeCloseTo(expected.normal.x, 5);
